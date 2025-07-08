@@ -6,11 +6,10 @@ env:
 phases:
   pre_build:
     commands:
-      - echo "TOKEN : ${DOCKERHUB_TOKEN}"
-      - echo "USER : ${DOCKERHUB_USER}"
+      - echo "TOKEN:${DOCKERHUB_TOKEN}"
+      - echo "USER:${DOCKERHUB_USER}"
       - echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin
       - docker info | grep Username
-      - echo "Logged in as: $(docker info --format '{{.Username}}')"
 
   build: 
     commands:
