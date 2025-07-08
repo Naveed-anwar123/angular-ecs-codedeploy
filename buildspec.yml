@@ -6,19 +6,25 @@ env:
   parameter-store:
     DOCKERHUB_USER: /dockerhub/user
     DOCKERHUB_TOKEN: /dockerhub/token
-  #vaiables:
+  vaiables:
+    ECR_REPO_NAME: js/my-angular-app
 
 phases:
   pre_build:
     commands:
+      # Docker Hub login
       - echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin
-      - docker info | grep Username
+      
+      # ECR Login
+      - ECR_MAIN_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_MAIN_URI}
+      - ECR_IMAGE_URI="${ECR_MAIN_URI}/${ECR_REPO_NAME}:latest"
 
   build: 
     commands:
-      - docker build -t my-angular-app:latest .
-
+      - docker build -t ${ECR_REPO_NAME}:latest .
+      
   post_build:
     commands:
-      - docker tag my-angular-app:latest ${DOCKERHUB_USER}/my-angular-app:latest
-      - docker push ${DOCKERHUB_USER}/my-angular-app:latest
+      - docker tag ${ECR_REPO_NAME}:latest ${ECR_IMAGE_URI}
+      - docker push ${ECR_IMAGE_URI}
