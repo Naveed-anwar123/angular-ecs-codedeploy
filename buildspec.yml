@@ -1,8 +1,13 @@
 version: 0.2
+env:
+  secrets-manager: 
+    DOCKERHUB_USER : DEV/ECS/DOCKERHUB:user
+    DOCKERHUB_TOKEN: DEV/ECS/DOCKERHUB:token
 phases:
   pre_build:
     commands:
       - echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin
+      - docker info | grep Username
 
   build: 
     commands:
